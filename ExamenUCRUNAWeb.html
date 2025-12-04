@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Razonamiento UNA / UCR</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 700px;
+      margin-top: 40px;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .mode-selector {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+    .filters label {
+      font-weight: bold;
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #question-text {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    #options button {
+      display: block;
+      margin: 10px 0;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    #feedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    #timer {
+      font-size: 18px;
+      color: red;
+      text-align: right;
+    }
+    #controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 Simulador de Razonamiento UNA / UCR</h1>
+
+    <div class="filters">
+      <label>Categoría:
+        <select id="category-select">
+          <option value="all">Todas</option>
+          <option value="matematica">Matemática</option>
+          <option value="verbal">Verbal</option>
+        </select>
+      </label>
+      <label>Dificultad:
+        <select id="difficulty-select">
+          <option value="all">Todas</option>
+          <option value="facil">Fácil</option>
+          <option value="medio">Media</option>
+          <option value="avanzado">Avanzada</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="mode-selector">
+      <button onclick="startQuiz('training')">Modo Entrenamiento</button>
+      <button onclick="startQuiz('test')">Modo Prueba (1 hora)</button>
+      <button onclick="resumeProgress()">📂 Continuar progreso guardado</button>
+    </div>
+
+    <div id="quiz-container" class="hidden">
+      <div id="timer" class="hidden"></div>
+      <div id="question-number"></div>
+      <div id="question-text"></div>
+      <div id="options"></div>
+      <div id="feedback"></div>
+      <div id="controls" class="hidden">
+        <button onclick="toggleTimer()">⏸ Pausar/Reanudar</button>
+        <button onclick="saveProgress()">💾 Guardar progreso</button>
+      </div>
+      <button id="next-btn" onclick="nextQuestion()">Siguiente</button>
+    </div>
+
+    <div id="results" class="hidden"></div>
+    <button onclick="location.reload()">Volver a empezar</button>
+    <button onclick="restartQuiz()">🔁 Reiniciar prueba</button>
+    <button onclick="goToMenu()">🏠 Menú principal</button>
+  </div>
+  <script>
+  let currentQuestion = 0;
+  let score = 0;
+  let mode = '';
+  let timerInterval;
+  let timeLeft = 3600;
+  let filteredQuestions = [];
+  let isPaused = false;
+  let savedProgress = null;
+
+  const questions = [
+    {
+    text: "¿Cuál es el siguiente número en la serie: 2, 4, 8, 16, ...?",
+    options: ["18", "24", "32", "20"],
+    answer: 2,
+    explanation: "Cada número se duplica: 16 × 2 = 32.",
+    category: "matematica",
+    difficulty: "facil"
+  },
+  {
+    text: "¿Cuál palabra no pertenece al grupo?",
+    options: ["Manzana", "Pera", "Banana", "Zanahoria"],
+    answer: 3,
+    explanation: "Zanahoria es una verdura, las demás son frutas.",
+    category: "verbal",
+    difficulty: "facil"
+  },
+  {
+    text: "Si todos los gatos son mamíferos y algunos mamíferos son perros, ¿cuál afirmación es verdadera?",
+    options: [
+      "Todos los gatos son perros",
+      "Algunos gatos son perros",
+      "Algunos mamíferos son gatos",
+      "Ningún mamífero es gato"
+    ],
+    answer: 2,
+    explanation: "La afirmación lógica válida es que algunos mamíferos son gatos.",
+    category: "verbal",
+    difficulty: "medio"
+  },
+  {
+    text: "¿Cuál es el siguiente número en la serie: 2, 4, 8, 16, ...?",
+    options: ["18", "24", "32", "20"],
+    answer: 2,
+    explanation: "Cada número se duplica: 16 × 2 = 32.",
+    category: "matematica",
+    difficulty: "facil"
+  },
+  {
+    text: "¿Cuál palabra no pertenece al grupo?",
+    options: ["Manzana", "Pera", "Banana", "Zanahoria"],
+    answer: 3,
+    explanation: "Zanahoria es una verdura, las demás son frutas.",
+    category: "verbal",
+    difficulty: "facil"
+  },
+  {
+    text: "Si todos los gatos son mamíferos y algunos mamíferos son perros, ¿cuál afirmación es verdadera?",
+    options: [
+      "Todos los gatos son perros",
+      "Algunos gatos son perros",
+      "Algunos mamíferos son gatos",
+      "Ningún mamífero es gato"
+    ],
+    answer: 2,
+    explanation: "La afirmación lógica válida es que algunos mamíferos son gatos.",
+    category: "verbal",
+    difficulty: "medio"
+  },
+  {
+    text: "¿Cuál número completa la serie? 3, 6, 9, __, 15",
+    options: ["10", "12", "11", "13"],
+    answer: 1,
+    explanation: "La serie aumenta de 3 en 3: 9 + 3 = 12.",
+    category: "matematica",
+    difficulty: "facil"
+  },
+  {
+    text: "¿Qué palabra es antónimo de 'optimista'?",
+    options: ["Pesimista", "Realista", "Idealista", "Soñador"],
+    answer: 0,
+    explanation: "'Pesimista' es lo opuesto a 'optimista'.",
+    category: "verbal",
+    difficulty: "facil"
+  },
+  {
+    text: "¿Cuál número completa la analogía? 2:4 :: 3:__",
+    options: ["5", "6", "7", "8"],
+    answer: 1,
+    explanation: "2 × 2 = 4, entonces 3 × 2 = 6.",
+    category: "matematica",
+    difficulty: "facil"
+  },
+  {
+    text: "¿Cuál es el sinónimo de 'rápido'?",
+    options: ["Lento", "Ágil", "Torpe", "Pesado"],
+    answer: 1,
+    explanation: "'Ágil' es sinónimo de 'rápido'.",
+    category: "verbal",
+    difficulty: "facil"
+  },
+  {
+    text: "Si hoy es martes, ¿qué día será dentro de 5 días?",
+    options: ["Viernes", "Sábado", "Domingo", "Lunes"],
+    answer: 2,
+    explanation: "Martes + 5 días = Domingo.",
+    category: "matematica",
+    difficulty: "facil"
+  },
+  {
+    text: "¿Cuál número no pertenece a la serie? 5, 10, 15, 20, 22, 25",
+    options: ["10", "15", "22", "25"],
+    answer: 2,
+    explanation: "La serie aumenta de 5 en 5, excepto el 22.",
+    category: "matematica",
+    difficulty: "medio"
+  },
+{
+  text: "¿Cuál es la capital de Francia?",
+  options: ["Madrid", "París", "Roma", "Berlín"],
+  answer: 1,
+  explanation: "París es la capital de Francia.",
+  category: "verbal",
+  difficulty: "facil"
+},
+{
+  text: "Si el doble de un número menos 7 es igual a 11, ¿cuál es el número?",
+  options: ["7", "9", "10", "11"],
+  answer: 1,
+  explanation: "2x - 7 = 11 → 2x = 18 → x = 9."
+},
+  {
+    text: "¿Cuál es el error lógico en la siguiente afirmación? 'Todos los estudiantes son responsables. Pedro no es estudiante. Por lo tanto, Pedro no es responsable.'",
+    options: [
+      "Falsa premisa",
+      "Generalización apresurada",
+      "Negación del antecedente",
+      "Afirmación del consecuente"
+    ],
+    answer: 2,
+    explanation: "Es un caso clásico de negación del antecedente."
+  },
+  {
+    text: "¿Qué palabra completa mejor la analogía? 'Agua es a sed como comida es a __'",
+    options: ["Hambre", "Cena", "Fruta", "Bebida"],
+    answer: 0,
+    explanation: "El agua calma la sed, la comida calma el hambre."
+  },
+  {
+    text: "¿Cuál es el valor de x en la ecuación log₂(x) = 5?",
+    options: ["10", "25", "32", "64"],
+    answer: 2,
+    explanation: "2⁵ = 32, por lo tanto x = 32."
+  },
+  {
+    text: "¿Cuál es la inferencia válida del siguiente argumento? 'Si llueve, no salgo. Salí. Por lo tanto...'",
+    options: [
+      "No llovió",
+      "Llovió",
+      "No se puede inferir",
+      "Salí con paraguas"
+    ],
+    answer: 0,
+    explanation: "Modus tollens: Si llueve → no salgo. Salí ⇒ no llovió."
+  },
+  {
+    text: "¿Qué número sigue en la serie? 1, 1, 2, 3, 5, 8, __",
+    options: ["11", "12", "13", "14"],
+    answer: 2,
+    explanation: "Serie de Fibonacci: 5 + 8 = 13."
+  },
+  {
+    text: "¿Cuál es el significado más cercano de la palabra 'inexorable'?",
+    options: ["Flexible", "Implacable", "Dudoso", "Evasivo"],
+    answer: 1,
+    explanation: "'Inexorable' significa que no se puede detener o persuadir: implacable."
+  },
+  {
+    text: "¿Cuál es el área de un círculo con radio 7 cm? (π ≈ 3.14)",
+    options: ["153.86", "144.22", "160.00", "140.00"],
+    answer: 0,
+    explanation: "Área = πr² = 3.14 × 49 = 153.86 cm²."
+  },
+  {
+    text: "¿Qué figura representa mejor una proposición bicondicional?",
+    options: ["↔", "→", "∧", "∨"],
+    answer: 0,
+    explanation: "↔ representa 'si y solo si', es decir, bicondicional."
+  },
+  {
+    text: "¿Cuál es el antónimo más preciso de 'efímero'?",
+    options: ["Rápido", "Eterno", "Breve", "Ligero"],
+    answer: 1,
+    explanation: "'Efímero' significa de corta duración; su opuesto es 'eterno'."
+  },
+  {
+    text: "Si un tren recorre 180 km en 2 horas, ¿cuál es su velocidad promedio?",
+    options: ["80 km/h", "85 km/h", "90 km/h", "95 km/h"],
+    answer: 2,
+    explanation: "Velocidad = distancia / tiempo = 180 / 2 = 90 km/h."
+  },
+  {
+    text: "¿Qué palabra no pertenece al grupo? 'Justicia', 'Equidad', 'Venganza', 'Imparcialidad'",
+    options: ["Justicia", "Equidad", "Venganza", "Imparcialidad"],
+    answer: 2,
+    explanation: "'Venganza' no es un valor ético como los otros."
+  },
+  {
+    text: "¿Cuál es el valor de x en la ecuación: √(x + 9) = 5?",
+    options: ["16", "25", "15", "20"],
+    answer: 0,
+    explanation: "x + 9 = 25 → x = 16."
+  },
+  {
+    text: "¿Qué tipo de falacia es: 'Mi abuela fumó toda su vida y vivió 90 años, así que fumar no es malo'?",
+    options: [
+      "Falsa analogía",
+      "Generalización apresurada",
+      "Petición de principio",
+      "Falsa causa"
+    ],
+    answer: 1,
+    explanation: "Se generaliza a partir de un solo caso anecdótico."
+  },
+  {
+    text: "¿Cuál es el número primo más cercano a 50?",
+    options: ["47", "49", "51", "53"],
+    answer: 3,
+    explanation: "53 es el número primo más cercano a 50."
+  },
+  {
+    text: "¿Qué significa la palabra 'ambivalente'?",
+    options: ["Contradictorio", "Indiferente", "Confuso", "Con dos valores opuestos"],
+    answer: 3,
+    explanation: "'Ambivalente' implica tener dos sentimientos o valores opuestos."
+  },
+  {
+    text: "¿Cuál es el resultado de 3⁴ × 3²?",
+    options: ["3⁶", "3⁸", "9⁶", "3⁷"],
+    answer: 0,
+    explanation: "Se suman los exponentes: 3⁴ × 3² = 3⁶."
+  },
+  {
+    text: "¿Qué palabra completa mejor la analogía? 'Médico es a hospital como maestro es a __'",
+    options: ["Escuela", "Libro", "Alumno", "Clase"],
+    answer: 0,
+    explanation: "El médico trabaja en un hospital, el maestro en una escuela."
+  },
+  {
+    text: "¿Cuál es el valor de x si 4x + 3 = 2x + 11?",
+    options: ["x = 3", "x = 4", "x = 5", "x = 6"],
+    answer: 2,
+    explanation: "4x - 2x = 11 - 3 → 2x = 8 → x = 4."
+  },
+  {
+    text: "¿Qué palabra es sinónimo de 'elocuente'?",
+    options: ["Callado", "Persuasivo", "Tímido", "Reservado"],
+    answer: 1,
+    explanation: "'Elocuente' significa que se expresa con claridad y persuasión."
+  },
+  {
+    text: "¿Cuál es el valor de x en la ecuación: 5x + 2 = 3x + 10?",
+    options: ["x = 4", "x = 3", "x = 5", "x = 6"],
+    answer: 0,
+    explanation: "5x - 3x = 10 - 2 → 2x = 8 → x = 4."
+  },
+  {
+    text: "¿Qué tipo de relación existe entre las palabras: 'causa' y 'efecto'?",
+    options: ["Temporal", "Consecuencia", "Oposición", "Analogía"],
+    answer: 1,
+    explanation: "Una causa genera un efecto: relación de consecuencia."
+  },
+  {
+    text: "¿Cuál es el valor de x si |x - 3| = 5?",
+    options: ["x = -2 o x = 8", "x = 2 o x = 6", "x = -5 o x = 5", "x = -8 o x = 2"],
+    answer: 0,
+    explanation: "x - 3 = ±5 → x = 8 o x = -2."
+  },
+  {
+    text: "¿Cuál es el sinónimo más preciso de 'prolijo'?",
+    options: ["Breve", "Extenso", "Confuso", "Ligero"],
+    answer: 1,
+    explanation: "'Prolijo' significa detallado o extenso."
+  },
+  {
+    text: "¿Qué número completa la serie? 81, 27, 9, 3, __",
+    options: ["1", "0", "2", "4"],
+    answer: 0,
+    explanation: "Serie divide entre 3: 3 ÷ 3 = 1."
+  },
+  {
+    text: "¿Cuál es el valor de x en la ecuación: (x + 2)(x - 2) = 36?",
+    options: ["x = 8 o x = -8", "x = 6 o x = -6", "x = 7 o x = -7", "x = 9 o x = -9"],
+    answer: 1,
+    explanation: "(x + 2)(x - 2) = x² - 4 = 36 → x² = 40 → x ≈ ±6.32 → ninguna opción exacta, pero 6 es la más cercana."
+  },
+  {
+    text: "¿Cuál es el antónimo más preciso de 'veraz'?",
+    options: ["Mentiroso", "Falso", "Engañoso", "Erróneo"],
+    answer: 1,
+    explanation: "'Falso' es lo opuesto directo de 'veraz'."
+  },
+  {
+    text: "¿Qué figura tiene todos sus lados iguales y todos sus ángulos iguales?",
+    options: ["Rombo", "Cuadrado", "Rectángulo", "Trapecio"],
+    answer: 1,
+    explanation: "El cuadrado cumple ambas condiciones."
+  },
+  {
+    text: "¿Cuál es el valor de x si 2x² - 8 = 0?",
+    options: ["x = ±2", "x = ±4", "x = ±3", "x = ±1"],
+    answer: 0,
+    explanation: "2x² = 8 → x² = 4 → x = ±2."
+  },
+  {
+    text: "¿Qué tipo de falacia es: 'Si no estás conmigo, estás contra mí'?",
+    options: ["Falsa dicotomía", "Ad hominem", "Petición de principio", "Falsa causa"],
+    answer: 0,
+    explanation: "Presenta solo dos opciones extremas: falsa dicotomía."
+  },
+  {
+    text: "¿Cuál es el valor de x si log₁₀(x) = 2?",
+    options: ["x = 100", "x = 10", "x = 20", "x = 50"],
+    answer: 0,
+    explanation: "10² = 100 → x = 100."
+  },
+  {
+    text: "¿Qué palabra completa mejor la analogía? 'Luz es a oscuridad como calor es a __'",
+    options: ["Frío", "Fuego", "Sol", "Temperatura"],
+    answer: 0,
+    explanation: "Luz y oscuridad son opuestos; calor y frío también."
+  },
+  {
+    text: "¿Cuál es el perímetro de un rectángulo de 8 cm de largo y 5 cm de ancho?",
+    options: ["26 cm", "30 cm", "24 cm", "20 cm"],
+    answer: 0,
+    explanation: "Perímetro = 2 × (8 + 5) = 26 cm."
+  },
+  {
+    text: "¿Cuál es el sinónimo más preciso de 'sagaz'?",
+    options: ["Ingenuo", "Astuto", "Lento", "Torpe"],
+    answer: 1,
+    explanation: "'Sagaz' significa astuto, perspicaz."
+  },
+  {
+    text: "¿Cuál número no pertenece a la serie? 2, 4, 8, 16, 34",
+    options: ["4", "8", "16", "34"],
+    answer: 3,
+    explanation: "La serie duplica: 2×2=4, 4×2=8, 8×2=16, 16×2=32 ≠ 34."
+  },
+    {
+      text: "¿Qué tipo de razonamiento se usa al concluir que 'todos los cisnes son blancos' tras observar 100 cisnes blancos?",
+      options: ["Deductivo", "Inductivo", "Analítico", "Abductivo"],
+      answer: 1,
+      explanation: "Generalización basada en observaciones: razonamiento inductivo."
+    }
+  ];
+  
+  function getFilteredQuestions() {
+    const category = document.getElementById('category-select').value;
+    const difficulty = document.getElementById('difficulty-select').value;
+
+    return questions.filter(q => {
+      const matchCategory = category === 'all' || q.category === category;
+      const matchDifficulty = difficulty === 'all' || q.difficulty === difficulty;
+      return matchCategory && matchDifficulty;
+    });
+  }
+
+  function startQuiz(selectedMode) {
+    mode = selectedMode;
+    currentQuestion = 0;
+    score = 0;
+    timeLeft = 3600;
+    filteredQuestions = getFilteredQuestions();
+    if (filteredQuestions.length === 0) {
+      alert("No hay preguntas que coincidan con los filtros seleccionados.");
+      return;
+    }
+    document.getElementById('results').classList.add('hidden');
+    document.querySelector('.mode-selector').classList.add('hidden');
+    document.getElementById('quiz-container').classList.remove('hidden');
+    document.getElementById('controls').classList.remove('hidden');
+    if (mode === 'test') {
+      document.getElementById('timer').classList.remove('hidden');
+      startTimer();
+    } else {
+      document.getElementById('timer').classList.add('hidden');
+    }
+    showQuestion();
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (!isPaused) {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer').textContent = `⏱️ Tiempo restante: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endQuiz();
+        }
+      }
+    }, 1000);
+  }
+
+  function showQuestion() {
+    const q = filteredQuestions[currentQuestion];
+    document.getElementById('question-number').textContent = `Pregunta ${currentQuestion + 1} de ${filteredQuestions.length}`;
+    document.getElementById('question-text').textContent = q.text;
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(i);
+      optionsDiv.appendChild(btn);
+    });
+    document.getElementById('feedback').textContent = '';
+  }
+
+  function checkAnswer(selected) {
+    const q = filteredQuestions[currentQuestion];
+    const feedback = document.getElementById('feedback');
+    if (selected === q.answer) {
+      score++;
+      feedback.textContent = `✅ ¡Correcto! ${q.explanation}`;
+      feedback.style.color = 'green';
+    } else {
+      feedback.textContent = `❌ Incorrecto. ${q.explanation}`;
+      feedback.style.color = 'red';
+    }
+    Array.from(document.getElementById('options').children).forEach(btn => btn.disabled = true);
+  }
+
+  function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < filteredQuestions.length) {
+      showQuestion();
+    } else {
+      endQuiz();
+    }
+  }
+
+  function endQuiz() {
+    clearInterval(timerInterval);
+    document.getElementById('quiz-container').classList.add('hidden');
+    document.getElementById('controls').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').innerHTML = `
+      <h2>🎉 Resultado Final</h2>
+      <p>Tu puntuación fue: ${score} de ${filteredQuestions.length}</p>
+      <button onclick="restartQuiz()">🔁 Reiniciar prueba</button>
+      <button onclick="goToMenu()">🏠 Menú principal</button>
+    `;
+  }
+
+  function restartQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    timeLeft = 3600;
+    document.getElementById('results').classList.add('hidden');
+    document.getElementById('quiz-container').classList.remove('hidden');
+    document.getElementById('controls').classList.remove('hidden');
+    if (mode === 'test') {
+      document.getElementById('timer').classList.remove('hidden');
+      startTimer();
+    } else {
+      document.getElementById('timer').classList.add('hidden');
+    }
+    showQuestion();
+  }
+
+  function goToMenu() {
+    clearInterval(timerInterval);
+    document.getElementById('results').classList.add('hidden');
+    document.getElementById('quiz-container').classList.add('hidden');
+    document.getElementById('controls').classList.add('hidden');
+    document.querySelector('.mode-selector').classList.remove('hidden');
+    document.getElementById('timer').classList.add('hidden');
+    timeLeft = 3600;
+  }
+
+  function toggleTimer() {
+    isPaused = !isPaused;
+  }
+
+  function saveProgress() {
+    savedProgress = {
+      currentQuestion,
+      score,
+      timeLeft,
+      filteredQuestions,
+      mode
+    };
+    alert("✅ Progreso guardado. Puedes volver al menú y continuar más tarde.");
+  }
+
+  function resumeProgress() {
+    if (!savedProgress) {
+      alert("No hay progreso guardado.");
+      return;
+    }
+    currentQuestion = savedProgress.currentQuestion;
+    score = savedProgress.score;
+    timeLeft = savedProgress.timeLeft;
+    filteredQuestions = savedProgress.filteredQuestions;
+    mode = savedProgress.mode;
+    document.getElementById('results').classList.add('hidden');
+    document.querySelector('.mode-selector').classList.add('hidden');
+    document.getElementById('quiz-container').classList.remove('hidden');
+    document.getElementById('controls').classList.remove('hidden');
+    if (mode === 'test') {
+      document.getElementById('timer').classList.remove('hidden');
+      startTimer();
+    }
+    showQuestion();
+  }
+  </script>
+</body>
+</html>
