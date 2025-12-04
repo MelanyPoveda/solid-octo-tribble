@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Family RP Studios</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+    header, footer {
+      background-color: #1f1f1f;
+      text-align: center;
+      padding: 20px;
+    }
+    nav {
+      background-color: #2c2c2c;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+    }
+    nav a {
+      color: #00ffd5;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    section {
+      padding: 40px;
+      max-width: 1000px;
+      margin: auto;
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    h2 {
+      color: #00ffd5;
+      margin-bottom: 20px;
+    }
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 6px;
+    }
+    .card h3 {
+      margin: 10px 0 5px;
+      color: #00ffd5;
+    }
+    .card p {
+      font-size: 0.9em;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Family RP Studios</h1>
+    <p>Tu historia comienza aquí</p>
+  </header>
+
+  <nav>
+    <a onclick="showSection('historia')">Historia</a>
+    <a onclick="showSection('trailers')">Trailers</a>
+    <a onclick="showSection('comunidad')">Comunidad</a>
+    <a onclick="showSection('tienda')">Tienda</a>
+    <a onclick="showSection('documentacion')">Documentación</a>
+    <a onclick="showSection('roster')">Roster</a>
+  </nav>
+
+  <section id="historia" class="active">
+    <h2>Historia</h2>
+    <p>Desde sus inicios en FiveM, Family RP ha evolucionado hasta convertirse en uno de los servidores más respetados del rol hispano.</p>
+  </section>
+
+  <section id="trailers">
+    <h2>Trailers</h2>
+    <ul>
+      <li>Family RP 4.0 - Teaser Oficial</li>
+      <li>Family RP 4.0 - Trailer Cinemático</li>
+    </ul>
+  </section>
+
+  <section id="comunidad">
+    <h2>Comunidad</h2>
+    <p>Únete a nuestro Discord y forma parte de una comunidad apasionada por el rol.</p>
+  </section>
+
+  <section id="tienda">
+    <h2>Tienda</h2>
+    <p>Próximamente: productos oficiales y contenido exclusivo.</p>
+  </section>
+
+  <section id="documentacion">
+    <h2>Documentación</h2>
+    <ul>
+      <li>Guía para nuevos jugadores</li>
+      <li>Normas del servidor</li>
+      <li>Aplicación para whitelist</li>
+    </ul>
+  </section>
+
+  <section id="roster">
+  <h2>Roster de Family RP</h2>
+  <p>Conoce a algunos de los personajes más icónicos del servidor Family RP.</p>
+  <div class="roster-grid">
+    <div class="card">
+      <img src="https://via.placeholder.com/200x250?text=Train" alt="Train">
+      <h3>Train</h3>
+      <p>Nombre del personaje: <strong>Cooper</strong><br>
+      Rol callejero, carismático y explosivo. Conocido por sus escenas intensas y su estilo único.</p>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/200x250?text=Lluisi" alt="Lluisi">
+      <h3>Lluisi</h3>
+      <p>Nombre del personaje: <strong>Jane Phoenix</strong><br>
+      Figura clave en el rol policial. Inteligente, firme y con gran presencia en operativos.</p>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/200x250?text=Mills" alt="Mills">
+      <h3>Mills</h3>
+      <p>Nombre del personaje: <strong>Revy Smith</strong><br>
+      Agente de la ley con un toque cómico. Muy querido por la comunidad por su espontaneidad.</p>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/200x250?text=M2" alt="M2">
+      <h3>M2</h3>
+      <p>Nombre del personaje: <strong>Marco “M2” Medina</strong><br>
+      Rol criminal estratégico. Líder de operaciones clandestinas y protagonista de tramas intensas.</p>
+    </div>
+  </div>
+</section>
+
+
+  <footer>
+    &copy; 2025 Family RP Studios. Todos los derechos reservados.
+  </footer>
+
+  <script>
+    function showSection(id) {
+      const sections = document.querySelectorAll('section');
+      sections.forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
