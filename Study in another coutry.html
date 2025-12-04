@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Melany — Portafolio de Informática</title>
+  <meta name="description" content="Portafolio interactivo para demostrar conocimientos en informática y aplicar a estudios en el extranjero." />
+
+  <!-- Tipografías y estilos base -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Paleta vibrante y accesible */
+      --bg: #0f1225;
+      --bg-2: #15183a;
+      --text: #eaf2ff;
+      --muted: #bcd0ff;
+      --primary: #6ee7ff;  /* cian */
+      --primary-2: #a78bfa;/* lila */
+      --accent: #22d3ee;   /* cian fuerte */
+      --accent-2: #ff8fab; /* rosa coral */
+      --success: #34d399;
+      --warning: #f59e0b;
+
+      --card: #1b1f4a;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box }
+    html, body { margin: 0; padding: 0; }
+    body{
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 80% 10%, rgba(103, 232, 249, 0.15), transparent 60%),
+        radial-gradient(900px 500px at 10% 70%, rgba(167, 139, 250, 0.12), transparent 60%),
+        linear-gradient(180deg, #0d1022 0%, #0f1225 60%, #0a0d1a 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a { color: var(--primary); text-decoration: none }
+    a:hover { color: var(--accent) }
+
+    /* Layout */
+    .container{
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+    }
+
+    header{
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(21,24,58,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    nav{
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: 0.6px }
+    .logo{
+      width: 36px; height: 36px; border-radius: 10px;
+      background: conic-gradient(from 200deg, var(--primary), var(--accent-2), var(--primary-2), var(--primary));
+      box-shadow: 0 6px 18px rgba(34, 211, 238, 0.35);
+    }
+    .nav-links{ display: flex; gap: 22px; }
+    .nav-links a{ padding: 8px 12px; border-radius: 10px; }
+    .nav-links a:hover{ background: rgba(255,255,255,0.06) }
+
+    /* Hero */
+    .hero{
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;
+      align-items: center;
+      padding: 60px 0 30px;
+    }
+    .hero h1{
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(28px, 5vw, 56px);
+      line-height: 1.05;
+      margin: 0 0 16px;
+    }
+    .gradient{
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent-2) 50%, var(--primary-2) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero .lead{
+      color: var(--muted);
+      font-size: clamp(16px, 2.5vw, 20px);
+      margin: 8px 0 22px;
+    }
+    .cta{ display: flex; gap: 14px; flex-wrap: wrap }
+    .btn{
+      border: none; cursor: pointer; font-weight: 700; letter-spacing: .3px;
+      padding: 12px 16px; border-radius: 12px; transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .btn-primary{
+      color: #051016; background: linear-gradient(90deg, var(--primary), var(--accent));
+      box-shadow: 0 10px 18px rgba(34, 211, 238, 0.25);
+    }
+    .btn-primary:hover{ transform: translateY(-2px) scale(1.02) }
+    .btn-ghost{
+      color: var(--text); background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .btn-ghost:hover{ background: rgba(255,255,255,0.12) }
+
+    .hero-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius); padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .metrics{ display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 8px }
+    .metric{
+      background: var(--card); border-radius: 12px; padding: 14px;
+      text-align: center; box-shadow: var(--shadow);
+    }
+    .metric .n{ font-weight: 800; font-size: 24px }
+    .metric .l{ font-size: 12px; color: var(--muted) }
+
+    /* Secciones */
+    section{ padding: 42px 0 }
+    .section-title{
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px; margin-bottom: 12px;
+    }
+    .section-sub{
+      color: var(--muted); margin-bottom: 22px;
+    }
+
+    /* Grid de proyectos */
+    .filters{ display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 18px }
+    .chip{
+      padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer; font-weight: 600;
+    }
+    .chip.active{ background: linear-gradient(90deg, var(--primary), var(--accent)); color: #051016; border: none }
+
+    .grid{
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
+    }
+    @media (max-width: 920px){ .hero{ grid-template-columns: 1fr } .grid{ grid-template-columns: 1fr 1fr } }
+    @media (max-width: 560px){ .grid{ grid-template-columns: 1fr } }
+
+    .card{
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover{ transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,0.45) }
+    .thumb{
+      height: 140px; background-size: cover; background-position: center;
+    }
+    .content{ padding: 16px; display: grid; gap: 8px }
+    .tags{ display: flex; gap: 8px; flex-wrap: wrap }
+    .tag{ font-size: 12px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.1) }
+    .card .actions{ margin-top: auto; display: flex; gap: 8px }
+    .btn-mini{ font-size: 13px; padding: 8px 10px; border-radius: 10px }
+
+    /* Habilidades */
+    .skills{ display: grid; grid-template-columns: repeat(4,1fr); gap: 12px }
+    @media (max-width: 920px){ .skills{ grid-template-columns: 1fr 1fr 1fr } }
+    @media (max-width: 560px){ .skills{ grid-template-columns: 1fr 1fr } }
+    .skill{
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px; padding: 14px;
+      display: grid; gap: 8px;
+    }
+    .bar{
+      height: 8px; border-radius: 8px; background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+    .bar .fill{
+      height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent-2));
+      width: var(--level, 50%);
+    }
+
+    /* Testimonios */
+    .testimonials{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+    @media (max-width: 920px){ .testimonials{ grid-template-columns: 1fr } }
+    .quote{
+      background: var(--card); border-radius: var(--radius); padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .quote .author{ font-weight: 700; margin-top: 8px; color: var(--primary-2) }
+
+    /* Timeline */
+    .timeline{ border-left: 2px dashed rgba(255,255,255,0.2); padding-left: 18px; display: grid; gap: 16px }
+    .milestone{
+      position: relative; padding-left: 6px;
+    }
+    .milestone::before{
+      content: ""; position: absolute; left: -11px; top: 4px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: linear-gradient(90deg, var(--primary), var(--accent-2));
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+    }
+    .milestone .date{ font-size: 12px; color: var(--muted) }
+
+    /* Contacto */
+    form{
+      display: grid; gap: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    label{ font-weight: 600 }
+    input, textarea, select{
+      background: rgba(255,255,255,0.08); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+      padding: 10px; outline: none;
+    }
+    input:focus, textarea:focus, select:focus{
+      border-color: var(--accent); box-shadow: 0 0 0 2px rgba(34,211,238,.25);
+    }
+    textarea{ min-height: 120px }
+
+    footer{
+      padding: 30px 0; color: var(--muted);
+    }
+
+    /* Modo claro */
+    .toggle{
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 12px; border-radius: 999px; cursor: pointer;
+    }
+    .light body{}
+    :root.light{
+      --bg: #f7f9ff;
+      --bg-2: #ffffff;
+      --text: #0f1225;
+      --muted: #4a5a7f;
+      --card: #ffffff;
+      --shadow: 0 10px 30px rgba(12, 18, 38, 0.12);
+    }
+    .light body{}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <span>Melany · Informática</span>
+        </div>
+        <div class="nav-links">
+          <a href="#perfil">Perfil</a>
+          <a href="#proyectos">Proyectos</a>
+          <a href="#habilidades">Habilidades</a>
+          <a href="#logros">Logros</a>
+          <a href="#contacto">Contacto</a>
+          <button id="themeToggle" class="toggle" aria-label="Cambiar tema">🌙 Modo oscuro</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <div>
+        <h1>
+          Hola, soy <span class="gradient">Melany</span>.
+        </h1>
+        <p class="lead">
+          Desarrolladora enfocada en lo social, lógica y experiencias interactivas. Busco estudiar Informática en el extranjero
+          para ampliar impacto y compartir herramientas que potencien el aprendizaje.
+        </p>
+        <div class="cta">
+          <a href="#proyectos" class="btn btn-primary">Ver proyectos destacados</a>
+    
+        </div>
+
+        <div class="hero-card" aria-label="Métricas y resultados">
+          <div class="metrics">
+            <div class="metric">
+              <div class="n">+1</div>
+              <div class="l">Certificacion lograda</div>
+            </div>
+            <div class="metric">
+              <div class="n">95%</div>
+              <div class="l">Satisfacción de notas</div>
+            </div>
+            <div class="metric">
+              <div class="n">3</div>
+              <div class="l">Paginas web creadas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pitch rápido -->
+      <div class="hero-card">
+        <h3 style="margin:0 0 8px">Por qué dejarme estudiar en otro país</h3>
+        <ul style="margin:0; padding-left:18px">
+          <li><strong>Impacto:</strong> amplio mis conocimentos de varias areas como idiomas, habilidaddes blandas y de mundo.</li>
+          <li><strong>Rigor:</strong> metodología de pruebas, feedback y mejora continua.</li>
+          <li><strong>Colaboración:</strong> de ustedes y de la beca.</li>
+          <li><strong>Proyección:</strong> proyectos escalables, transferibles a distintos contextos, conocer a nuevas personas y ampliar mi conocimiento.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Perfil -->
+    <section id="perfil">
+      <h2 class="section-title">Perfil y propósito</h2>
+      <p class="section-sub">
+        Soy una creadora de experiencias de aprendizaje. Me apasiona convertir contenidos de lógica, matemáticas y razonamiento
+        verbal en prácticas auténticas y medibles. Mi objetivo: estudiar Informática en otro país para fortalecer mi base
+        científica, ampliar redes y devolver ese conocimiento con impacto local y global. Porque en otro pais? Pq en esos lados del planeta tienes una amplia capacidad tecnologiaca y en concecuencia su en¿ducacioon es superior en esta area.
+      </p>
+
+      <div class="timeline">
+        <div class="milestone">
+          <div class="date">2021–2023</div>
+          <div><strong>Primera parte</strong>: fue mi primer periodo de apredizaje en el colegio q pase con "exitos" y mucho estres pero pase.</div>
+        </div>
+        <div class="milestone">
+          <div class="date">2024-2025</div>
+          <div><strong>Segunda parte</strong>: fue mi ultimo periodo del colegio el cual pase y termine con top notas y conocimentos.</div>
+        </div>
+        <div class="milestone">
+          <div class="date">2026-...</div>
+          <div><strong>Tercera parte</strong>: va a hacer si ustedes me dejan en otro pais donde se ampliara mi cocimento y vida.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Proyectos -->
+    <section id="proyectos">
+      <h2 class="section-title">Proyectos</h2>
+      <p class="section-sub">Filtra por área para ver lo más relevante.</p>
+
+      <div class="filters" role="group" aria-label="Filtros de proyectos">
+        <button class="chip active" data-filter="todos">Todos</button>
+        <button class="chip" data-filter="web"> Politiaca</button>
+        <button class="chip" data-filter="edtech">Gta web</button>
+        <button class="chip" data-filter="datos">Preguntas UCR/UNA</button>
+        <button class="chip" data-filter="uiux">Esta</button>
+      </div>
+
+      <div class="grid" id="projectsGrid">
+        <!-- Proyecto 1 -->
+        <article class="card" data-tags="web edtech uiux">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1547658719-50a40df1b0b9?q=80&w=1200&auto=format&fit=crop');"></div>
+          <div class="content">
+            <h3>Politica</h3>
+            <p>Plataforma con analisis, preguntas y noticias.</p>
+            <div class="tags">
+              <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-mini btn-ghost" href="#" target="_blank">Demo</a>
+              <a class="btn btn-mini btn-primary" href="#" target="_blank">Código</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Proyecto 2 -->
+        <article class="card" data-tags="datos edtech">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200&auto=format&fit=crop');"></div>
+          <div class="content">
+            <h3>Gta web</h3>
+            <p>Informacion, actualiciones y minijuego.</p>
+            <div class="tags">
+              <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-mini btn-ghost" href="#" target="_blank">Demo</a>
+              <a class="btn btn-mini btn-primary" href="#" target="_blank">Código</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Proyecto 3 -->
+        <article class="card" data-tags="uiux web">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1200&auto=format&fit=crop');"></div>
+          <div class="content">
+            <h3>Preguntas de logica para practica de UCR/UNA</h3>
+            <p>Preguntas, analisis, feetback y resultados.</p>
+            <div class="tags">
+              <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-mini btn-ghost" href="#" target="_blank">Demo</a>
+              <a class="btn btn-mini btn-primary" href="#" target="_blank">Código</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Proyecto 4 -->
+        <article class="card" data-tags="edtech web datos">
+          <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1504639725590-34d36dd3a1fc?q=80&w=1200&auto=format&fit=crop');"></div>
+          <div class="content">
+            <h3>Study in another coutry</h3>
+            <p>Convecerlos a utedes de estudiar en el estranjero.</p>
+            <div class="tags">
+              <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-mini btn-ghost" href="#" target="_blank">Demo</a>
+              <a class="btn btn-mini btn-primary" href="#" target="_blank">Código</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Habilidades -->
+    <section id="habilidades">
+      <h2 class="section-title">Habilidades técnicas</h2>
+      <p class="section-sub">Dominio práctico y enfoque en la resolución de problemas.</p>
+
+      <div class="skills">
+        <div class="skill">
+          <div><strong>Informatica</strong> · HTML, CSS</div>
+          <div class="bar"><div class="fill" style="--level: 85%"></div></div>
+        </div>
+        <div class="skill">
+          <div><strong>Idiomas</strong> · ingles, español</div>
+          <div class="bar"><div class="fill" style="--level: 80%"></div></div>
+        </div>
+        <div class="skill">
+          <div><strong>interactivas</strong> · Habla, conexcion y social</div>
+          <div class="bar"><div class="fill" style="--level: 70%"></div></div>
+        </div>
+        <div class="skill">
+          <div><strong>Sobrevivencia</strong> · iteración y resolucion de problemas</div>
+          <div class="bar"><div class="fill" style="--level: 90%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Logros y testimonios -->
+    <section id="logros">
+      <h2 class="section-title">Logros y testimonios</h2>
+      <p class="section-sub">Validación externa de impacto y calidad.</p>
+
+      <div class="testimonials">
+        <div class="quote">
+          “Melany es una persona con ambicion, conecta mucho con las personas y es inceible y tiene un gran futro por delante.”
+          <div class="author">Fiorella</div>
+        </div>
+        <div class="quote">
+          “Ideas claras, comunicación efectivas e inteligente. Excelente para trabajo colaborativo.”
+          <div class="author">MDon  Gustavo</div>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+<!-- Becas -->
+<section id="becas">
+  <h2 class="section-title">🎓 Becas disponibles</h2>
+  <p class="section-sub">Opciones internacionales para estudiar Informática y áreas afines.</p>
+
+  <div class="grid">
+    <!-- Beca 1 -->
+    <article class="card">
+      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b9?q=80&w=1200&auto=format&fit=crop');"></div>
+      <div class="content">
+        <h3>Beca Erasmus+ Europa</h3>
+        <p><strong>País:</strong> España, Alemania, Francia<br>
+           <strong>Carrera:</strong> Informática / Ingeniería de Software<br>
+           <strong>Requisitos:</strong> Promedio ≥ 85, inglés B2, carta de motivación.<br>
+           <strong>Fecha límite:</strong> 15 marzo 2026</p>
+        <div class="actions">
+          <a class="btn btn-mini btn-primary" href="#" target="_blank">Más información</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Beca 2 -->
+    <article class="card">
+      <div class="thumb" style="background-image:url('https://keystoneacademic-res.cloudinary.com/image/upload/c_pad,w_256,h_121/dpr_auto/f_auto/q_auto/v1/element/24/248514_HSUTCC_Circle.png');"></div>
+      <div class="content">
+        <h3>Beca Bangkok</h3>
+        <p><strong>País:</strong> Tailandia<br>
+           <strong>Carrera:</strong> Ciencias de la Computación<br>
+           <strong>Requisitos:</strong> Titulo de colegio, expreriencia, aplication fee.<br>
+           <strong>Fecha límite:</strong> NONE</p>
+        <div class="actions">
+          <a class="btn btn-mini btn-primary" href="https://harbour.space/account/experience" target="_blank">Más información</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Beca 3 -->
+    <article class="card">
+      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1503676382389-4809596d5290?q=80&w=1200&auto=format&fit=crop');"></div>
+      <div class="content">
+        <h3>Beca Fulbright EE.UU.</h3>
+        <p><strong>País:</strong> Estados Unidos<br>
+           <strong>Carrera:</strong> Informática / Inteligencia Artificial<br>
+           <strong>Requisitos:</strong> TOEFL ≥ 90, liderazgo comunitario, entrevista.<br>
+           <strong>Fecha límite:</strong> 1 junio 2026</p>
+        <div class="actions">
+          <a class="btn btn-mini btn-primary" href="#" target="_blank">Más información</a>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+  <footer class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap:8px">
+      <div>© 2025 Melany. Hecho con dedicación desde Ángeles, Heredia.</div>
+      <div style="display:flex; gap:12px">
+        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+        <a href="#" aria-label="GitHub">GitHub</a>
+        <a href="#" aria-label="Portafolio">Portafolio</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Modo oscuro/claro
+    const toggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const preferred = localStorage.getItem('theme');
+    if (preferred === 'light') root.classList.add('light');
+
+    function updateToggleText(){
+      toggle.textContent = root.classList.contains('light') ? '☀️ Modo claro' : '🌙 Modo oscuro';
+    }
+    updateToggleText();
+
+    toggle.addEventListener('click', () => {
+      root.classList.toggle('light');
+      localStorage.setItem('theme', root.classList.contains('light') ? 'light' : 'dark');
+      updateToggleText();
+    });
+
+    // Filtros de proyectos
+    const chips = document.querySelectorAll('.chip');
+    const cards = document.querySelectorAll('.card');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const filter = chip.dataset.filter;
+        cards.forEach(card => {
+          const tags = card.dataset.tags.split(' ');
+          const show = (filter === 'todos') || tags.includes(filter);
+          card.style.display = show ? 'flex' : 'none';
+        });
+      });
+    });
+
+    // Envío del formulario (simulado)
+    const form = document.getElementById('contactForm');
+    const status = document.getElementById('formStatus');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = 'Enviando…';
+
+      // Simula una petición
+      await new Promise(res => setTimeout(res, 900));
+
+      status.textContent = '¡Gracias! Te responderé en 24–48 horas.';
+      form.reset();
+    });
+
+    // Descargar CV (placeholder)
+    const dl = document.getElementById('downloadCV');
+    dl.addEventListener('click', () => {
+      const blob = new Blob(
+        [ `%PDF-1.4
+% CV de Melany — Portafolio
+` ],
+        { type: 'application/pdf' }
+      );
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'Melany-CV.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
