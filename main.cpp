@@ -12,7 +12,7 @@ int main (int argc, char *argv[]) {
 	cin >> nombre
 
 	cout << "Digite su nombre completo\n";
-	getline(cin, nombrecompleto)
+	getline(cin, nombrecompleto) // getline is used	to read all the line not only the first word of the reponse of the user
 	
 	cout << "Cual es tu edad\n";
 	cin >> edad;
@@ -23,5 +23,6 @@ int main (int argc, char *argv[]) {
 	cout << "\n\n\n\nY se quien eres, eres " << nombre << " y tienenes " << edad << " a" << char(164) << "os";
 	return 0;
 }
+
 
 
