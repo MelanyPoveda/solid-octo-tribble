@@ -10,7 +10,8 @@ int main (int argc, char *argv[]) {
 	
 	cout << "Como te llamas\n"; // \n = enter same as python and you also can use endl
 	cin >> nombre
-
+	cin.ignore()
+		
 	cout << "Digite su nombre completo\n";
 	getline(cin, nombrecompleto) // getline is used	to read all the line not only the first word of the reponse of the user
 	
@@ -23,6 +24,7 @@ int main (int argc, char *argv[]) {
 	cout << "\n\n\n\nY se quien eres, eres " << nombre << " y tienenes " << edad << " a" << char(164) << "os";
 	return 0;
 }
+
 
 
 
